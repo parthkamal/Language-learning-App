@@ -9,11 +9,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LearnMiwok">
-        <activity android:name=".ColorsActivity"></activity>
-        <activity android:name=".NumbersActivity" />
-        <activity android:name=".PhrasesActivity" />
-        <activity android:name=".FamilyActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ColorsActivity" android:label="Colors"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".NumbersActivity" android:label="Numbers"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".PhrasesActivity" android:label="Phrases"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".FamilyActivity" android:label="Family Members"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

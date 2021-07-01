@@ -1,4 +1,4 @@
-package com.parth.learnmiwok;
+package com.parth.learnmiwok.fragments;
 
 import android.content.Context;
 import android.media.AudioAttributes;
@@ -7,17 +7,23 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.parth.learnmiwok.R;
+import com.parth.learnmiwok.Word;
 
 import java.util.ArrayList;
 
-public class NumbersActivity extends AppCompatActivity {
+
+public class NumbersFragment extends Fragment {
+
     //media player to be called when a media is to be played
     private MediaPlayer mediaPlayer;
 
@@ -47,11 +53,23 @@ public class NumbersActivity extends AppCompatActivity {
 
 
 
+    public NumbersFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_numbers);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.fragment_numbers, container, false);
+        // Inflate the layout for this fragment
         ArrayList<Word> words = new ArrayList<>();
         words.add(new Word("one", "lutti", R.drawable.number_one,R.raw.number_one));
         words.add(new Word("two", "otiiko", R.drawable.number_two,R.raw.number_two));
@@ -65,13 +83,13 @@ public class NumbersActivity extends AppCompatActivity {
         words.add(new Word("ten", "na’aacha", R.drawable.number_ten,R.raw.number_ten));
 
         //managing audio focus
-        audioManager =(AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager =(AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         // defining playback attributes
 
         audioAttributes =new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_GAME)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build();
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
 
         AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
@@ -79,27 +97,27 @@ public class NumbersActivity extends AppCompatActivity {
                 .setOnAudioFocusChangeListener(onAudioFocusChangeListener)
                 .build();
 
-       final int audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
+        final int audioFocusRequest = audioManager.requestAudioFocus(focusRequest);
 
 
         //checking the log messages
 
         //attaching adapter to the data source
 
-        wordsAdapter customAdapter = new wordsAdapter(this,words,R.color.category_numbers);
+        com.parth.learnmiwok.wordsAdapter customAdapter = new com.parth.learnmiwok.wordsAdapter(getActivity(),words,R.color.category_numbers);
         //attaching view source to the array adapter
-        ListView listView=findViewById(R.id.lv_number_items);
+        ListView listView=rootView.findViewById(R.id.lv_number_items);
         listView.setAdapter(customAdapter);
 
         //setting on item click listener to play song
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
-            //release the mediaplayer if it it playing
+            //release the mediaPlayer if it it playing
             releaseMediaPlayer();
 
 
             Word current_data = (Word) adapterView.getItemAtPosition(i);
             if(audioFocusRequest ==AudioManager.AUDIOFOCUS_GAIN){
-                mediaPlayer =MediaPlayer.create(NumbersActivity.this,current_data.getSongResource());
+                mediaPlayer = MediaPlayer.create(getActivity(),current_data.getSongResource());
                 mediaPlayer.start();
                 //we need to detach the resource after the start of the audio
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -110,13 +128,12 @@ public class NumbersActivity extends AppCompatActivity {
                 });
             }
         });
+        return rootView;
 
     }
 
-    //we also need to release the media source when we leave the activity
-
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }

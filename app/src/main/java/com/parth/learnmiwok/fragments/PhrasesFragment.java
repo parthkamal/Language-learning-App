@@ -1,7 +1,4 @@
-package com.parth.learnmiwok;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
+package com.parth.learnmiwok.fragments;
 
 import android.content.Context;
 import android.media.AudioAttributes;
@@ -10,13 +7,24 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.parth.learnmiwok.R;
+import com.parth.learnmiwok.Word;
+import com.parth.learnmiwok.wordsAdapter;
+
 import java.util.ArrayList;
 
-public class PhrasesActivity extends AppCompatActivity {
+
+public class PhrasesFragment extends Fragment {
     private MediaPlayer mediaPlayer;
     AudioManager audioManager;
     //this is to be used for managing the audio interruptions
@@ -42,11 +50,16 @@ public class PhrasesActivity extends AppCompatActivity {
         }
     };
 
+
+    public PhrasesFragment() {
+        // Required empty public constructor
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_numbers);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView =inflater.inflate(R.layout.fragment_numbers, container, false);
         ArrayList<Word> words = new ArrayList<Word>();
         words.add(new Word("Where are you going?", "minto wuksus",R.raw.phrase_are_you_coming));
         words.add(new Word("What is your name?", "tinnә oyaase'nә",R.raw.phrase_what_is_your_name));
@@ -60,7 +73,7 @@ public class PhrasesActivity extends AppCompatActivity {
         words.add(new Word("Come here.", "әnni'nem",R.raw.phrase_come_here));
 
         //managing audio focus
-        audioManager =(AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager =(AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         // defining playback attributes
 
         audioAttributes =new AudioAttributes.Builder()
@@ -78,12 +91,12 @@ public class PhrasesActivity extends AppCompatActivity {
 
         // Create an {@link WordAdapter}, whose data source is a list of {@link Word}s. The
         // adapter knows how to create list items for each item in the list.
-        wordsAdapter adapter = new wordsAdapter(this, words,R.color.category_phrases);
+        wordsAdapter adapter = new wordsAdapter(getActivity(), words,R.color.category_phrases);
 
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // word_list.xml layout file.
-        ListView listView = (ListView) findViewById(R.id.lv_number_items);
+        ListView listView = (ListView) rootView.findViewById(R.id.lv_number_items);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
@@ -98,7 +111,7 @@ public class PhrasesActivity extends AppCompatActivity {
 
                 Word current_data = (Word) adapterView.getItemAtPosition(i);
                 if(audioFocusRequest ==AudioManager.AUDIOFOCUS_GAIN){
-                    mediaPlayer =MediaPlayer.create(PhrasesActivity.this,current_data.getSongResource());
+                    mediaPlayer =MediaPlayer.create(getActivity(),current_data.getSongResource());
                     mediaPlayer.start();
                     mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
@@ -110,19 +123,17 @@ public class PhrasesActivity extends AppCompatActivity {
 
             }
         });
+        // Inflate the layout for this fragment
+        return rootView;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
-
-    @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }
+
+
     private void releaseMediaPlayer() {
         // If the media player is not null, then it may be currently playing a sound.
         if (mediaPlayer != null) {
